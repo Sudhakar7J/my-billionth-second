@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useLayoutEffect } from "react";
 import { siX, siVercel, siNextdotjs, siTailwindcss } from "simple-icons";
 import { motion } from "framer-motion";
 import { Linkedin } from "lucide-react";
@@ -37,19 +38,33 @@ const Divider = () => (
   </span>
 );
 
-const HeartIcon = () => (
-  <motion.span
-    className="inline-flex text-red-500 w-4 justify-center"
-    animate={{ scale: [1, 1.2, 1] }}
-    transition={{
-      duration: 1.5,
-      repeat: Infinity,
-      ease: "easeInOut",
-    }}
-  >
-    ❤️
-  </motion.span>
-);
+const HeartIcon = () => {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useLayoutEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return (
+      <span className="inline-flex text-red-500 w-4 justify-center">❤️</span>
+    );
+  }
+
+  return (
+    <motion.span
+      className="inline-flex text-red-500 w-4 justify-center"
+      animate={{ scale: [1, 1.2, 1] }}
+      transition={{
+        duration: 1.5,
+        repeat: Infinity,
+        ease: "easeInOut",
+      }}
+    >
+      ❤️
+    </motion.span>
+  );
+};
 
 const IconLink = ({
   href,
@@ -64,7 +79,7 @@ const IconLink = ({
     href={href}
     target="_blank"
     rel="noopener noreferrer"
-    className="inline-flex items-center gap-1.5 text-muted-foreground/80 hover:text-primary transition-colors"
+    className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-primary transition-colors"
   >
     <svg
       role="img"
@@ -80,7 +95,7 @@ const IconLink = ({
 );
 
 const FooterCredit = () => (
-  <p className="text-xs text-center leading-relaxed text-muted-foreground/60 flex items-center justify-center flex-wrap gap-1.5">
+  <p className="text-xs text-center leading-relaxed text-muted-foreground flex items-center justify-center flex-wrap gap-1.5">
     <span>Made with</span>
     <HeartIcon />
     <span>using</span>
@@ -103,7 +118,7 @@ const FooterCredit = () => (
       href="https://www.linkedin.com/in/sudhakar-j/"
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex items-center gap-1.5 text-muted-foreground/80 hover:text-primary transition-colors"
+      className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-primary transition-colors"
     >
       <Linkedin className="h-3.5 w-3.5 min-w-[14px]" />
       Sudhakar Jeeva

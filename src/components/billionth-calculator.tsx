@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import {
   Card,
   CardContent,
@@ -34,6 +34,9 @@ import {
   LinkedInIcon,
 } from "@/components/ui/social-icons";
 
+const BILLION_SECONDS = 1000000000;
+const BILLION_MILLISECONDS = BILLION_SECONDS * 1000;
+
 // Helper function to get ordinal suffix
 const getOrdinal = (n: number): string => {
   const s = ["th", "st", "nd", "rd"];
@@ -42,10 +45,12 @@ const getOrdinal = (n: number): string => {
 };
 
 export function BillionthCalculator() {
-  const [loading, setLoading] = useState(true);
+  const [isMounted, setIsMounted] = useState(false);
   const [month, setMonth] = useState<number>();
   const [year, setYear] = useState<number>();
   const [day, setDay] = useState<number>();
+  const [hour, setHour] = useState<number>();
+  const [minute, setMinute] = useState<number>();
   const [billionthSecond, setBillionthSecond] = useState<Date>();
   const [nextBillionthSecond, setNextBillionthSecond] = useState<Date>();
   const [timeLeft, setTimeLeft] = useState<string>();
@@ -54,6 +59,11 @@ export function BillionthCalculator() {
   const [currentBillion, setCurrentBillion] = useState<number>(1);
   const [previousMilestones, setPreviousMilestones] = useState<Date[]>([]);
   const milestoneRef = useRef<HTMLDivElement>(null);
+
+  // Prevent hydration mismatch
+  useLayoutEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Calculate a reasonable year range
   const currentYear = new Date().getFullYear();
@@ -89,6 +99,12 @@ export function BillionthCalculator() {
     return Array.from({ length: 31 }, (_, i) => i + 1); // Default to 31 days
   };
 
+  // Generate hours array (00-23)
+  const hours = Array.from({ length: 24 }, (_, i) => i);
+
+  // Generate minutes array (00-59)
+  const minutes = Array.from({ length: 60 }, (_, i) => i);
+
   // Validate and adjust day if needed when month/year changes
   useEffect(() => {
     if (month !== undefined && year !== undefined && day !== undefined) {
@@ -102,21 +118,20 @@ export function BillionthCalculator() {
   const calculateProgress = (birthDate: Date) => {
     const now = new Date();
     const elapsed = now.getTime() - birthDate.getTime();
-    const billionSeconds = 1000000000 * 1000; // in milliseconds
 
     // Calculate which billionth second we're working towards
-    const billionsPassed = Math.floor(elapsed / billionSeconds);
+    const billionsPassed = Math.floor(elapsed / BILLION_MILLISECONDS);
     const currentBillionStart = new Date(
-      birthDate.getTime() + billionsPassed * billionSeconds
+      birthDate.getTime() + billionsPassed * BILLION_MILLISECONDS
     );
     const nextBillionDate = new Date(
-      currentBillionStart.getTime() + billionSeconds
+      currentBillionStart.getTime() + BILLION_MILLISECONDS
     );
 
     // Calculate all previous milestones
     if (billionsPassed > 0) {
       const milestones = Array.from({ length: billionsPassed }, (_, i) => {
-        return new Date(birthDate.getTime() + (i + 1) * billionSeconds);
+        return new Date(birthDate.getTime() + (i + 1) * BILLION_MILLISECONDS);
       });
       setPreviousMilestones(milestones);
     } else {
@@ -125,7 +140,8 @@ export function BillionthCalculator() {
 
     // Calculate progress to next billion
     const currentProgress =
-      ((now.getTime() - currentBillionStart.getTime()) / billionSeconds) * 100;
+      ((now.getTime() - currentBillionStart.getTime()) / BILLION_MILLISECONDS) *
+      100;
 
     setHasPassed(billionsPassed > 0);
     setCurrentBillion(billionsPassed + 1);
@@ -140,16 +156,16 @@ export function BillionthCalculator() {
   const calculateBillionthSecond = (
     month: number,
     year: number,
-    day: number
+    day: number,
+    hour: number = 0,
+    minute: number = 0
   ) => {
-    const birthDate = new Date(year, month, day);
-    const billionSeconds = 1000000000;
-    const billionthDate = new Date(birthDate.getTime() + billionSeconds * 1000);
+    const birthDate = new Date(year, month, day, hour, minute);
+    const billionthDate = new Date(birthDate.getTime() + BILLION_MILLISECONDS);
     setBillionthSecond(billionthDate);
 
-    // Calculate next billionth second (will be updated in calculateProgress if needed)
     const nextBillionthDate = new Date(
-      billionthDate.getTime() + billionSeconds * 1000
+      billionthDate.getTime() + BILLION_MILLISECONDS
     );
     setNextBillionthSecond(nextBillionthDate);
 
@@ -181,10 +197,16 @@ export function BillionthCalculator() {
   }, [billionthSecond]);
 
   useEffect(() => {
-    if (month !== undefined && year !== undefined && day !== undefined) {
-      calculateBillionthSecond(month, year, day);
+    if (
+      month !== undefined &&
+      year !== undefined &&
+      day !== undefined &&
+      hour !== undefined &&
+      minute !== undefined
+    ) {
+      calculateBillionthSecond(month, year, day, hour, minute);
     }
-  }, [month, year, day]);
+  }, [month, year, day, hour, minute]);
 
   const addToCalendar = (date: Date, billionth: number) => {
     try {
@@ -378,15 +400,7 @@ export function BillionthCalculator() {
     }
   };
 
-  // Simulate loading state
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (loading) {
+  if (!isMounted) {
     return (
       <Card className="w-full max-w-xl border-2 bg-background/60 backdrop-blur-sm">
         <CardHeader className="space-y-4 text-center pb-6 md:pb-8">
@@ -447,13 +461,12 @@ export function BillionthCalculator() {
             Calculate Your Milestone
           </CardTitle>
           <CardDescription className="text-sm md:text-base">
-            Enter your birth date to discover your billionth second
+            Enter your birth date and time to discover your billionth second
           </CardDescription>
         </div>
       </CardHeader>
       <CardContent className="space-y-6 md:space-y-8">
         <div className="space-y-3 md:space-y-4">
-          <label className="text-sm font-medium leading-none">Birth Date</label>
           <div className="flex flex-wrap md:flex-nowrap gap-2">
             <Select
               value={day?.toString()}
@@ -514,6 +527,50 @@ export function BillionthCalculator() {
                 {years.map((year) => (
                   <SelectItem key={year} value={year.toString()}>
                     {year}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <div className="flex items-center text-muted-foreground">at</div>
+
+            <Select
+              value={hour?.toString()}
+              onValueChange={(value) => setHour(parseInt(value))}
+            >
+              <SelectTrigger className="w-[80px]">
+                <SelectValue placeholder="HH" />
+              </SelectTrigger>
+              <SelectContent
+                position="popper"
+                align="start"
+                className="max-h-[300px]"
+              >
+                {hours.map((h) => (
+                  <SelectItem key={h} value={h.toString()}>
+                    {h.toString().padStart(2, "0")}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <div className="flex items-center text-muted-foreground">:</div>
+
+            <Select
+              value={minute?.toString()}
+              onValueChange={(value) => setMinute(parseInt(value))}
+            >
+              <SelectTrigger className="w-[80px]">
+                <SelectValue placeholder="MM" />
+              </SelectTrigger>
+              <SelectContent
+                position="popper"
+                align="start"
+                className="max-h-[300px]"
+              >
+                {minutes.map((m) => (
+                  <SelectItem key={m} value={m.toString()}>
+                    {m.toString().padStart(2, "0")}
                   </SelectItem>
                 ))}
               </SelectContent>

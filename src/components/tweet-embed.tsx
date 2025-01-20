@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useLayoutEffect } from "react";
 import Script from "next/script";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card } from "@/components/ui/card";
@@ -20,11 +20,19 @@ declare global {
 }
 
 export function TweetEmbed() {
+  const [isMounted, setIsMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [loadAttempts, setLoadAttempts] = useState(0);
   const maxAttempts = 5;
 
+  // Prevent hydration mismatch
+  useLayoutEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   useEffect(() => {
+    if (!isMounted) return;
+
     const loadTweet = () => {
       if (window.twttr) {
         window.twttr.widgets.load();
@@ -44,7 +52,11 @@ export function TweetEmbed() {
         return () => clearTimeout(timer);
       }
     }
-  }, [isLoading, loadAttempts]);
+  }, [isLoading, loadAttempts, isMounted]);
+
+  if (!isMounted) {
+    return <LoadingSkeleton />;
+  }
 
   return (
     <>
@@ -56,17 +68,7 @@ export function TweetEmbed() {
       />
       <div className="w-full max-w-[550px] min-h-[250px] md:min-h-[500px]">
         {isLoading ? (
-          <Card className="w-full space-y-4 p-4 md:p-6">
-            <Skeleton className="h-10 md:h-14 w-full" />
-            <Skeleton className="h-32 md:h-40 w-full" />
-            <div className="flex items-center space-x-4">
-              <Skeleton className="h-10 md:h-12 w-10 md:w-12 rounded-full" />
-              <div className="space-y-2">
-                <Skeleton className="h-3 md:h-4 w-[200px] md:w-[250px]" />
-                <Skeleton className="h-3 md:h-4 w-[150px] md:w-[200px]" />
-              </div>
-            </div>
-          </Card>
+          <LoadingSkeleton />
         ) : (
           <div className="relative w-full">
             <blockquote
@@ -76,7 +78,7 @@ export function TweetEmbed() {
               data-conversation="none"
               data-dnt="true"
             >
-              <a href="https://twitter.com/MKBHD/status/1879281378422063328?ref_src=twsrc%5Etfw"></a>
+              <a href="https://twitter.com/MKBHD/status/1879281378422063328"></a>
             </blockquote>
             {loadAttempts >= maxAttempts && (
               <div className="absolute inset-0 flex items-center justify-center bg-card/80 backdrop-blur-sm rounded-lg">
@@ -92,3 +94,17 @@ export function TweetEmbed() {
     </>
   );
 }
+
+const LoadingSkeleton = () => (
+  <Card className="w-full space-y-4 p-4 md:p-6">
+    <Skeleton className="h-10 md:h-14 w-full" />
+    <Skeleton className="h-32 md:h-40 w-full" />
+    <div className="flex items-center space-x-4">
+      <Skeleton className="h-10 md:h-12 w-10 md:w-12 rounded-full" />
+      <div className="space-y-2">
+        <Skeleton className="h-3 md:h-4 w-[200px] md:w-[250px]" />
+        <Skeleton className="h-3 md:h-4 w-[150px] md:w-[200px]" />
+      </div>
+    </div>
+  </Card>
+);
