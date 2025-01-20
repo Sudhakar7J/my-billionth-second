@@ -2,6 +2,8 @@ import { Metadata } from "next";
 import { BillionthCalculator } from "@/components/billionth-calculator";
 import { TweetEmbed } from "@/components/tweet-embed";
 import { Toaster } from "@/components/ui/sonner";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "Billionth Second Calculator",
@@ -14,6 +16,28 @@ export const metadata: Metadata = {
     type: "website",
   },
 };
+
+function PageSkeleton() {
+  return (
+    <div className="w-full max-w-xl border-2 bg-background/60 backdrop-blur-sm rounded-lg">
+      <div className="p-6 md:p-8 space-y-6">
+        <div className="space-y-2">
+          <Skeleton className="h-8 w-3/4 mx-auto" />
+          <Skeleton className="h-5 w-2/3 mx-auto" />
+        </div>
+        <div className="space-y-4">
+          <div className="flex flex-wrap gap-2 justify-center">
+            <Skeleton className="h-10 w-[70px]" />
+            <Skeleton className="h-10 w-[70px]" />
+            <Skeleton className="h-10 w-[90px]" />
+            <Skeleton className="h-10 w-[70px]" />
+            <Skeleton className="h-10 w-[70px]" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function Home() {
   return (
@@ -34,12 +58,16 @@ export default function Home() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
             <div className="w-full flex justify-center order-2 lg:order-1">
               <div className="lg:sticky lg:top-8 w-full">
-                <BillionthCalculator />
+                <Suspense fallback={<PageSkeleton />}>
+                  <BillionthCalculator />
+                </Suspense>
               </div>
             </div>
             <div className="w-full flex justify-center order-1 lg:order-2">
               <div className="lg:sticky lg:top-8 w-full">
-                <TweetEmbed />
+                <Suspense fallback={<PageSkeleton />}>
+                  <TweetEmbed />
+                </Suspense>
               </div>
             </div>
           </div>

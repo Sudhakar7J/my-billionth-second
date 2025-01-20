@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { MovingGradientBackground } from "@/components/ui/moving-gradient-background";
 import { Footer } from "@/components/ui/footer";
 import "./globals.css";
+import { Analytics } from "@/components/analytics";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -43,6 +44,7 @@ export default function RootLayout({
           <main className="flex-1">{children}</main>
           <Footer />
         </div>
+        <Analytics />
       </body>
     </html>
   );

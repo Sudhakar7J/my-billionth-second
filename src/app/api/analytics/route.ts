@@ -18,7 +18,8 @@ export async function GET() {
       uniqueVisitors,
       status: "success",
     });
-  } catch (error) {
+  } catch (error: unknown) {
+    console.error("Analytics error:", error);
     return NextResponse.json(
       {
         error: "Analytics temporarily unavailable",
