@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Script from "next/script";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Card } from "@/components/ui/card";
 
 interface TwitterWidgets {
   load: () => void;
@@ -20,23 +21,30 @@ declare global {
 
 export function TweetEmbed() {
   const [isLoading, setIsLoading] = useState(true);
+  const [loadAttempts, setLoadAttempts] = useState(0);
+  const maxAttempts = 5;
 
   useEffect(() => {
     const loadTweet = () => {
       if (window.twttr) {
         window.twttr.widgets.load();
+        return true;
       }
+      return false;
     };
 
-    if (!isLoading) {
-      loadTweet();
-      // Retry a few times in case the widget doesn't load immediately
-      const retryTimes = [100, 500, 1000, 2000];
-      retryTimes.forEach((delay) => {
-        setTimeout(loadTweet, delay);
-      });
+    if (!isLoading && loadAttempts < maxAttempts) {
+      const success = loadTweet();
+      if (!success) {
+        // Exponential backoff for retries
+        const delay = Math.min(1000 * Math.pow(2, loadAttempts), 10000);
+        const timer = setTimeout(() => {
+          setLoadAttempts((prev) => prev + 1);
+        }, delay);
+        return () => clearTimeout(timer);
+      }
     }
-  }, [isLoading]);
+  }, [isLoading, loadAttempts]);
 
   return (
     <>
@@ -44,28 +52,41 @@ export function TweetEmbed() {
         src="https://platform.twitter.com/widgets.js"
         strategy="afterInteractive"
         onLoad={() => setIsLoading(false)}
+        onError={() => setLoadAttempts((prev) => prev + 1)}
       />
-      <div className="flex justify-center w-full min-h-[500px] items-start">
+      <div className="w-full max-w-[550px] min-h-[250px] md:min-h-[500px]">
         {isLoading ? (
-          <div className="w-full max-w-[550px] space-y-4 p-6 border rounded-xl bg-card">
-            <Skeleton className="h-14 w-full" />
-            <Skeleton className="h-40 w-full" />
+          <Card className="w-full space-y-4 p-4 md:p-6">
+            <Skeleton className="h-10 md:h-14 w-full" />
+            <Skeleton className="h-32 md:h-40 w-full" />
             <div className="flex items-center space-x-4">
-              <Skeleton className="h-12 w-12 rounded-full" />
+              <Skeleton className="h-10 md:h-12 w-10 md:w-12 rounded-full" />
               <div className="space-y-2">
-                <Skeleton className="h-4 w-[250px]" />
-                <Skeleton className="h-4 w-[200px]" />
+                <Skeleton className="h-3 md:h-4 w-[200px] md:w-[250px]" />
+                <Skeleton className="h-3 md:h-4 w-[150px] md:w-[200px]" />
               </div>
             </div>
-          </div>
+          </Card>
         ) : (
-          <blockquote
-            className="twitter-tweet"
-            data-theme="dark"
-            data-align="center"
-          >
-            <a href="https://twitter.com/MKBHD/status/1879281378422063328?ref_src=twsrc%5Etfw"></a>
-          </blockquote>
+          <div className="relative w-full">
+            <blockquote
+              className="twitter-tweet"
+              data-theme="dark"
+              data-align="center"
+              data-conversation="none"
+              data-dnt="true"
+            >
+              <a href="https://twitter.com/MKBHD/status/1879281378422063328?ref_src=twsrc%5Etfw"></a>
+            </blockquote>
+            {loadAttempts >= maxAttempts && (
+              <div className="absolute inset-0 flex items-center justify-center bg-card/80 backdrop-blur-sm rounded-lg">
+                <p className="text-sm text-muted-foreground text-center px-4">
+                  Unable to load tweet. Please check your connection and refresh
+                  the page.
+                </p>
+              </div>
+            )}
+          </div>
         )}
       </div>
     </>
