@@ -23,6 +23,9 @@ export const metadata: Metadata = {
     description: "Celebrate your billionth second of life",
     type: "website",
   },
+  icons: {
+    icon: "../../public/asset/icons/favicon_clock.jpeg",
+  },
 };
 
 export default function RootLayout({
