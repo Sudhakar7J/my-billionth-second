@@ -4,6 +4,8 @@ import { useState, useEffect, useLayoutEffect } from "react";
 import Script from "next/script";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { RefreshCw } from "lucide-react";
 
 interface TwitterWidgets {
   load: () => void;
@@ -23,12 +25,17 @@ export function TweetEmbed() {
   const [isMounted, setIsMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [loadAttempts, setLoadAttempts] = useState(0);
-  const maxAttempts = 5;
+  const maxAttempts = 3;
 
   // Prevent hydration mismatch
   useLayoutEffect(() => {
     setIsMounted(true);
   }, []);
+
+  const handleRetry = () => {
+    setIsLoading(true);
+    setLoadAttempts(0);
+  };
 
   useEffect(() => {
     if (!isMounted) return;
@@ -81,11 +88,24 @@ export function TweetEmbed() {
               <a href="https://twitter.com/MKBHD/status/1879281378422063328"></a>
             </blockquote>
             {loadAttempts >= maxAttempts && (
-              <div className="absolute inset-0 flex items-center justify-center bg-card/80 backdrop-blur-sm rounded-lg">
-                <p className="text-sm text-muted-foreground text-center px-4">
-                  Unable to load tweet. Please check your connection and refresh
-                  the page.
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-card/95 backdrop-blur-sm rounded-lg p-6">
+                <p className="text-sm text-muted-foreground text-center">
+                  Unable to load tweet. This could be due to:
+                  <br />
+                  • Slow internet connection
+                  <br />
+                  • X/Twitter being blocked in your region
+                  <br />• Browser privacy settings
                 </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleRetry}
+                  className="gap-2"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                  Try Again
+                </Button>
               </div>
             )}
           </div>

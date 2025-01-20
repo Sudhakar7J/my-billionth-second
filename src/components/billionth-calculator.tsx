@@ -467,114 +467,118 @@ export function BillionthCalculator() {
       </CardHeader>
       <CardContent className="space-y-6 md:space-y-8">
         <div className="space-y-3 md:space-y-4">
-          <div className="flex flex-wrap md:flex-nowrap gap-2">
-            <Select
-              value={day?.toString()}
-              onValueChange={(value) => setDay(parseInt(value))}
-            >
-              <SelectTrigger className="w-[80px] md:w-[90px]">
-                <SelectValue placeholder="DD" />
-              </SelectTrigger>
-              <SelectContent
-                position="popper"
-                align="start"
-                className="max-h-[300px]"
+          <div className="flex flex-wrap md:flex-nowrap gap-2 justify-center">
+            <div className="flex items-center gap-2">
+              <Select
+                value={day?.toString()}
+                onValueChange={(value) => setDay(parseInt(value))}
               >
-                {getDays().map((d) => (
-                  <SelectItem key={d} value={d.toString()}>
-                    {d.toString().padStart(2, "0")}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+                <SelectTrigger className="w-[70px] md:w-[80px]">
+                  <SelectValue placeholder="Date" />
+                </SelectTrigger>
+                <SelectContent
+                  position="popper"
+                  align="start"
+                  className="max-h-[300px]"
+                >
+                  {getDays().map((d) => (
+                    <SelectItem key={d} value={d.toString()}>
+                      {d.toString().padStart(2, "0")}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-            <div className="flex items-center text-muted-foreground">-</div>
+              <span className="text-muted-foreground">/</span>
 
-            <Select
-              value={month?.toString()}
-              onValueChange={(value) => setMonth(parseInt(value))}
-            >
-              <SelectTrigger className="w-[120px] md:w-[140px]">
-                <SelectValue placeholder="MM" />
-              </SelectTrigger>
-              <SelectContent
-                position="popper"
-                align="start"
-                className="max-h-[300px]"
+              <Select
+                value={month?.toString()}
+                onValueChange={(value) => setMonth(parseInt(value))}
               >
-                {months.map((month, index) => (
-                  <SelectItem key={month} value={index.toString()}>
-                    {month}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+                <SelectTrigger className="w-[70px] md:w-[80px]">
+                  <SelectValue placeholder="Month" />
+                </SelectTrigger>
+                <SelectContent
+                  position="popper"
+                  align="start"
+                  className="max-h-[300px]"
+                >
+                  {months.map((month, index) => (
+                    <SelectItem key={month} value={index.toString()}>
+                      {(index + 1).toString().padStart(2, "0")}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-            <div className="flex items-center text-muted-foreground">-</div>
+              <span className="text-muted-foreground">/</span>
 
-            <Select
-              value={year?.toString()}
-              onValueChange={(value) => setYear(parseInt(value))}
-            >
-              <SelectTrigger className="w-[100px] md:w-[120px]">
-                <SelectValue placeholder="YYYY" />
-              </SelectTrigger>
-              <SelectContent
-                position="popper"
-                align="start"
-                className="max-h-[300px]"
+              <Select
+                value={year?.toString()}
+                onValueChange={(value) => setYear(parseInt(value))}
               >
-                {years.map((year) => (
-                  <SelectItem key={year} value={year.toString()}>
-                    {year}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+                <SelectTrigger className="w-[90px] md:w-[100px]">
+                  <SelectValue placeholder="Year" />
+                </SelectTrigger>
+                <SelectContent
+                  position="popper"
+                  align="start"
+                  className="max-h-[300px]"
+                >
+                  {years.map((year) => (
+                    <SelectItem key={year} value={year.toString()}>
+                      {year}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-            <div className="flex items-center text-muted-foreground">at</div>
+            <div className="flex items-center gap-2">
+              <span className="text-muted-foreground">at</span>
 
-            <Select
-              value={hour?.toString()}
-              onValueChange={(value) => setHour(parseInt(value))}
-            >
-              <SelectTrigger className="w-[80px]">
-                <SelectValue placeholder="HH" />
-              </SelectTrigger>
-              <SelectContent
-                position="popper"
-                align="start"
-                className="max-h-[300px]"
+              <Select
+                value={hour?.toString()}
+                onValueChange={(value) => setHour(parseInt(value))}
               >
-                {hours.map((h) => (
-                  <SelectItem key={h} value={h.toString()}>
-                    {h.toString().padStart(2, "0")}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+                <SelectTrigger className="w-[70px] md:w-[80px]">
+                  <SelectValue placeholder="Hour" />
+                </SelectTrigger>
+                <SelectContent
+                  position="popper"
+                  align="start"
+                  className="max-h-[300px]"
+                >
+                  {hours.map((h) => (
+                    <SelectItem key={h} value={h.toString()}>
+                      {h.toString().padStart(2, "0")}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-            <div className="flex items-center text-muted-foreground">:</div>
+              <span className="text-muted-foreground">:</span>
 
-            <Select
-              value={minute?.toString()}
-              onValueChange={(value) => setMinute(parseInt(value))}
-            >
-              <SelectTrigger className="w-[80px]">
-                <SelectValue placeholder="MM" />
-              </SelectTrigger>
-              <SelectContent
-                position="popper"
-                align="start"
-                className="max-h-[300px]"
+              <Select
+                value={minute?.toString()}
+                onValueChange={(value) => setMinute(parseInt(value))}
               >
-                {minutes.map((m) => (
-                  <SelectItem key={m} value={m.toString()}>
-                    {m.toString().padStart(2, "0")}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+                <SelectTrigger className="w-[80px] md:w-[90px]">
+                  <SelectValue placeholder="Minute" />
+                </SelectTrigger>
+                <SelectContent
+                  position="popper"
+                  align="start"
+                  className="max-h-[300px]"
+                >
+                  {minutes.map((m) => (
+                    <SelectItem key={m} value={m.toString()}>
+                      {m.toString().padStart(2, "0")}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
 
