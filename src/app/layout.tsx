@@ -4,7 +4,7 @@ import { MovingGradientBackground } from "@/components/ui/moving-gradient-backgr
 import { Footer } from "@/components/ui/footer";
 import "./globals.css";
 import { Analytics } from "@/components/analytics";
-
+import { Analytics as VercelAnalytics } from "@vercel/analytics/react";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -45,6 +45,7 @@ export default function RootLayout({
           <Footer />
         </div>
         <Analytics />
+        <VercelAnalytics />
       </body>
     </html>
   );
