@@ -31,12 +31,16 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
             <div className="w-full flex justify-center order-2 lg:order-1">
-              <BillionthCalculator />
+              <div className="lg:sticky lg:top-8 w-full">
+                <BillionthCalculator />
+              </div>
             </div>
-            <div className="w-full flex justify-center lg:sticky lg:top-8 order-1 lg:order-2">
-              <TweetEmbed />
+            <div className="w-full flex justify-center order-1 lg:order-2">
+              <div className="lg:sticky lg:top-8 w-full">
+                <TweetEmbed />
+              </div>
             </div>
           </div>
         </div>

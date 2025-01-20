@@ -66,14 +66,14 @@ export function TweetEmbed() {
   }
 
   return (
-    <>
+    <Card className="w-full max-w-xl border-2 bg-background/60 backdrop-blur-sm">
       <Script
         src="https://platform.twitter.com/widgets.js"
         strategy="afterInteractive"
         onLoad={() => setIsLoading(false)}
         onError={() => setLoadAttempts((prev) => prev + 1)}
       />
-      <div className="w-full max-w-[550px] min-h-[250px] md:min-h-[500px]">
+      <div className="w-full">
         {isLoading ? (
           <LoadingSkeleton />
         ) : (
@@ -111,12 +111,12 @@ export function TweetEmbed() {
           </div>
         )}
       </div>
-    </>
+    </Card>
   );
 }
 
 const LoadingSkeleton = () => (
-  <Card className="w-full space-y-4 p-4 md:p-6">
+  <div className="space-y-4 p-4 md:p-6">
     <Skeleton className="h-10 md:h-14 w-full" />
     <Skeleton className="h-32 md:h-40 w-full" />
     <div className="flex items-center space-x-4">
@@ -126,5 +126,5 @@ const LoadingSkeleton = () => (
         <Skeleton className="h-3 md:h-4 w-[150px] md:w-[200px]" />
       </div>
     </div>
-  </Card>
+  </div>
 );
